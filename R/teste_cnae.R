@@ -26,3 +26,8 @@ base_receita_limpa <- base_receita %>%
  basend_pericia <- base_com_cnpj_limpo %>%
   dplyr::inner_join(base_receita_limpa, "cnpj")
 
+
+# Exportar  ---------------------------------------------------------------
+
+writexl::write_xlsx(base_com_cnpj_limpo, "~/Documents/nepiPericia/base_teste_2.xlsx")
+# essa base serviu de exemplo para a base_principal
