@@ -1,0 +1,37 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Análise de Constatação Prévia 
+
+Visualizações produzidas para apresentação de projeto no NEPI - Núcleo de Estudos e Pesquisa em Insolvência (PUC-SP)
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+#Importação das bases tidys para análise 
+path_bases <-  "~/Documents/nepiPericia/data/"
+importar_bases <- fs::dir_ls(path = path_bases, pattern = ".xls")
+
+cnae_base <-
+  readxl::read_excel(paste0(path = path_bases, "base_cnae.xlsx"))
+perito_base <-
+  readxl::read_excel(paste0(path = path_bases, "base_perito.xlsx"))
+
+```
+## TODO
+
+#### Casos deferidos e indeferidos porcentagem 
+
+#### um gráfico de barras com a porcentagem - natureza jurídica
+
+#### uma tabela com as atividades (count)
+
+#### uma tabela com as naturezas jurídicas e o resultado do laudo

@@ -29,7 +29,7 @@ base_perito_tidy <- base_perito %>%
   janitor::clean_names() %>%
   dplyr::rename(resultado_constatacao = resultado_da_constatacao_deferimento_indeferimento,
                 responsavel_constatacao = resposavel_constatacao) %>%
-    dplyr::select(
+  dplyr::select(
     n_processo,
     # colunas base para o join (precisa decidir se relmente faz sentido dar join)
     deferido,
@@ -51,4 +51,7 @@ base_perito_tidy <- base_perito %>%
     resultado_final = limpa_nomes(resultado_final)
   )
 
+# Exportando para estudo --------------------------------------------------
 
+writexl::write_xlsx(base_perito_tidy, "~/Documents/nepiPericia/base_perito.xlsx")
+writexl::write_xlsx(base_cnae_tidy, "~/Documents/nepiPericia/base_cnae.xlsx")
