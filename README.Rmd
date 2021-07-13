@@ -6,8 +6,10 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+  echo = FALSE, 
+  message = FALSE, 
+  warning = FALSE,
+  fig.align = "center"
 )
 ```
 
@@ -26,12 +28,71 @@ perito_base <-
   readxl::read_excel(paste0(path = path_bases, "base_perito.xlsx"))
 
 ```
-## TODO
-
 #### Casos deferidos e indeferidos porcentagem 
+```{r quantidade-deferido}
+perito_base |>
+  dplyr::filter(tem_pericia == "sim") |>
+  dplyr::count(deferido) |>
+  dplyr::mutate(deferido = stringr::str_replace(deferido, "nao", "Não")) |>
+  dplyr::mutate(deferido = stringr::str_replace(deferido, "sim", "Sim")) |>
+  dplyr::mutate(prop = n / sum(n)) |>
+  janitor::adorn_totals() |>
+  dplyr::mutate(prop = formattable::percent(prop, 1)) |>
+  purrr::set_names("Deferido", "Quantidade", "%") |>
+  knitr::kable(caption = "Quantidade de processos deferidos com perícia prévia")
+```
 
-#### um gráfico de barras com a porcentagem - natureza jurídica
+#### Atividades econômicas 
 
-#### uma tabela com as atividades (count)
+```{r quantidade-atividades}
+cnae_base |>
+  dplyr::filter(n_processo != "10164223420178260100") |>
+  dplyr::group_by(cnae_fiscal) |>
+  dplyr::count(cnae_fiscal) |>
+  dplyr::arrange(desc(n)) |>
+  janitor::adorn_totals() |>
+  dplyr::mutate(prop = n / sum(n)*2) |>
+  dplyr::mutate(prop = formattable::percent(prop)) |>
+  purrr::set_names("Cnae", "Quantidade", "%") |>
+  knitr::kable(caption = "Atividades econômicas")
+```
+*Não informadas* no Comprovante de Inscrição e de Situação Cadastral da receita federal. 
 
-#### uma tabela com as naturezas jurídicas e o resultado do laudo
+#### Gráfico de barras da porcentagem das naturezas jurídicas 
+
+```{r quantidade-natureza}
+  cnae_base |>
+    dplyr::filter(n_processo != "10164223420178260100") |>
+    dplyr::count(natureza, sort = TRUE) |> 
+    dplyr::mutate(prop = n/sum(n)) |> 
+    dplyr::mutate(prop = formattable::percent(prop)) |>
+    ggplot2::ggplot() +
+    ggplot2::aes(x = prop, y = natureza, label = prop)+
+    ggplot2::geom_col(fill = "#eccc40", width = .8)+
+    ggplot2::geom_label(size = 3) +
+    ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
+    ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
+    ggplot2::theme_minimal(10)
+```
+
+
+#### Resultado da constatação prévia por natureza jurídica
+
+```{r quantidade-resultados}
+cnae_base |>
+  dplyr::filter(n_processo != "10164223420178260100") |>
+  dplyr::group_by(resultado_da_constatacao) |>
+  dplyr::count(natureza) |>
+  dplyr::mutate(prop = n / sum(n)) |>
+  dplyr::mutate(prop = formattable::percent(prop)) |>
+  ggplot2::ggplot() +
+  ggplot2::aes(x = prop, y = natureza, label = prop) +
+  ggplot2::geom_col(fill = "#eccc40") +
+  ggplot2::geom_label(size = 2) +
+  ggplot2::facet_wrap( ~ resultado_da_constatacao) +
+  ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
+  ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
+  ggplot2::theme_minimal(10)
+```
+
+__Obs:__ O processo com o nº processo de __10164223420178260100__ foi retidado na análise das atividades e naturezas jurídicas. 

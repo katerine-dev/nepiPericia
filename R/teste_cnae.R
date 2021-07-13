@@ -3,9 +3,10 @@ library(magrittr)
 
 path_bases <-  "~/Documents/nepiPericia/data-raw/"
 importar_bases <- fs::dir_ls(path = path_bases, pattern = ".xls")
+# primeira base:
+#base_receita <- readxl::read_excel(paste0(path = path_bases, "dados_receita.xlsx"))
 
-base_receita <- readxl::read_excel(paste0(path = path_bases, "dados_receita.xlsx"))
-base_pericia <-  readxl::read_excel(paste0(path = path_bases, "planilha_pericia.xlsx"))
+base_pericia <-  readxl::read_excel(paste0(path = path_bases, "planilha_perito.xlsx"))
 
 
 # tidy cnpjs --------------------------------------------------------------
@@ -17,14 +18,16 @@ base_com_cnpj_limpo <- base_pericia %>%
   dplyr::filter(cnpj != "NA") %>%
   dplyr::mutate(cnpj = abjutils::clean_cnj(cnpj))
 
-base_receita_limpa <- base_receita %>%
+# Base principal
+  base_receita_limpa <- base_receita %>%
   dplyr::select(cnpj, razao_social, cnae_fiscal, codigo_natureza_juridica)
-
-
+# solução alternativa
+#base_ramo <- obsFase2::out_ramo_atuacao # outra solução mais completa
 # cruzar base -------------------------------------------------------------
 
  basend_pericia <- base_com_cnpj_limpo %>%
-  dplyr::inner_join(base_receita_limpa, "cnpj")
+  dplyr::inner_join(base_receita_limpa, c("n_processo", "cnpj"))
+  # com a solução alternativa seria aplicada base_ramo, no final faltariam 2 casos
 
 
 # Exportar  ---------------------------------------------------------------
