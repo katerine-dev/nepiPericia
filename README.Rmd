@@ -47,9 +47,11 @@ perito_base |>
 ```{r quantidade-atividades}
 cnae_base |>
   dplyr::filter(n_processo != "10164223420178260100") |>
-  dplyr::group_by(cnae_fiscal) |>
+  dplyr::mutate(cnae_fiscal = forcats::fct_lump_n(
+    cnae_fiscal, 1, other_level = "Outros"
+  )) |>  
   dplyr::count(cnae_fiscal) |>
-  dplyr::arrange(desc(n)) |>
+  dplyr::arrange(cnae_fiscal) |>
   janitor::adorn_totals() |>
   dplyr::mutate(prop = n / sum(n)*2) |>
   dplyr::mutate(prop = formattable::percent(prop)) |>
@@ -61,18 +63,20 @@ cnae_base |>
 #### Gráfico de barras da porcentagem das naturezas jurídicas 
 
 ```{r quantidade-natureza}
-  cnae_base |>
-    dplyr::filter(n_processo != "10164223420178260100") |>
-    dplyr::count(natureza, sort = TRUE) |> 
-    dplyr::mutate(prop = n/sum(n)) |> 
-    dplyr::mutate(prop = formattable::percent(prop)) |>
-    ggplot2::ggplot() +
-    ggplot2::aes(x = prop, y = natureza, label = prop)+
-    ggplot2::geom_col(fill = "#eccc40", width = .8)+
-    ggplot2::geom_label(size = 3) +
-    ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
-    ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
-    ggplot2::theme_minimal(10)
+# para considerar apenas uma casa depois da virgula na label
+pct <- \(x) scales::percent(x, accuracy = .1)
+cnae_base |>
+  dplyr::filter(n_processo != "10164223420178260100") |>
+  dplyr::count(natureza, sort = TRUE) |> 
+  dplyr::mutate(natureza = forcats::fct_reorder(natureza, n)) |> 
+  dplyr::mutate(prop = n/sum(n)) |> 
+  ggplot2::ggplot() +
+  ggplot2::aes(x = prop, y = natureza, label = pct(prop)) +
+  ggplot2::geom_col(fill = "#eccc40", width = .8)+
+  ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 3) +
+  ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
+  ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
+  ggplot2::theme_minimal(10)
 ```
 
 
@@ -83,12 +87,12 @@ cnae_base |>
   dplyr::filter(n_processo != "10164223420178260100") |>
   dplyr::group_by(resultado_da_constatacao) |>
   dplyr::count(natureza) |>
+  dplyr::mutate(natureza = forcats::fct_reorder(natureza, n, sum)) |> 
   dplyr::mutate(prop = n / sum(n)) |>
-  dplyr::mutate(prop = formattable::percent(prop)) |>
   ggplot2::ggplot() +
-  ggplot2::aes(x = prop, y = natureza, label = prop) +
+  ggplot2::aes(x = prop, y = natureza, label = pct(prop)) +
   ggplot2::geom_col(fill = "#eccc40") +
-  ggplot2::geom_label(size = 2) +
+  ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 2) +
   ggplot2::facet_wrap( ~ resultado_da_constatacao) +
   ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
   ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
