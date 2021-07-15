@@ -15,7 +15,14 @@ knitr::opts_chunk$set(
 
 # Análise de Constatação Prévia 
 
-Visualizações produzidas para apresentação de projeto no NEPI - Núcleo de Estudos e Pesquisa em Insolvência (PUC-SP)
+Visualizações produzidas para apresentação de projeto no NEPI - Núcleo de Estudos e Pesquisa em Insolvência (PUC-SP). 
+
+A base original foi adquirida pelo estudo do Observatório da Insolvência: Segunda fase da Associação Brasileira de Jurimetria. A partir dela foram realizados análises relacionados aos tipos de empresa e atividade econômicas das partes.
+Resultando em novas duas bases:
+A Base original constavam 122 casos que apresentavam perícia prévia, mas realizando a classificação manual para a base da análise de perito foram identificados 18 casos fora do escop (*Esse resultado será considerado na atualização da base originária*), restando portando 104 processos com perícia prévia. 
+
+Para a análise relacionado às empresas foi considerado a base de dados da Receita Federal do Brasil (RFB). 
+
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 #Importação das bases tidys para análise 
@@ -99,4 +106,6 @@ cnae_base |>
   ggplot2::theme_minimal(10)
 ```
 
-__Obs:__ O processo com o nº processo de __10164223420178260100__ foi retidado na análise das atividades e naturezas jurídicas. 
+__Obs:__ O processo com o nº processo de __10164223420178260100__ foi retidado na análise das atividades e naturezas jurídicas, afim de evitar dados que poderiam influenciar os resultados (*Processo consiste em um litisconsórcio de 30 empresas do meus grupo econômico*).
+
+
