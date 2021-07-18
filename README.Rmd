@@ -105,6 +105,9 @@ cnae_base |>
   ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
   ggplot2::theme_minimal(10)
 ```
+
+
+
 #### Desfechos dos processos com perícia prévia 
 
 ```{r}
