@@ -50,6 +50,8 @@ receita federal.
 
 <img src="README_files/figure-gfm/quantidade-resultados-1.png" style="display: block; margin: auto;" />
 
+<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+
 **Obs:** O processo com o nº processo de **10164223420178260100** foi
 retidado na análise das atividades e naturezas jurídicas, afim de evitar
 dados que poderiam influenciar os resultados (*Processo consiste em um

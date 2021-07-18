@@ -106,6 +106,24 @@ cnae_base |>
   ggplot2::theme_minimal(10)
 ```
 
+```{r}
+perito_base |> 
+dplyr::filter(n_processo!="10164223420178260100") |> 
+dplyr::filter(tem_pericia == "sim") |> 
+dplyr::filter(!is.na(resultado_final)) |> 
+dplyr::mutate(resultado_final = stringr::str_to_sentence(resultado_final)) |> 
+dplyr::count(resultado_final) |> 
+dplyr::mutate(prop = n/sum(n)) |>
+ggplot2::ggplot()+
+ggplot2::aes(x = prop , y = forcats::fct_reorder(resultado_final, prop),  label = pct(prop)) +
+ggplot2::geom_col(fill = "#eccc40", width = .8)+
+ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 2) +
+ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1))+
+ggplot2::labs(x = "Proporção", y = "Resultado Final") +
+ggplot2::theme_minimal(10)
+```
+
+
 __Obs:__ O processo com o nº processo de __10164223420178260100__ foi retidado na análise das atividades e naturezas jurídicas, afim de evitar dados que poderiam influenciar os resultados (*Processo consiste em um litisconsórcio de 30 empresas do meus grupo econômico*).
 
 
