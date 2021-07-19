@@ -98,19 +98,32 @@ cnae_base |>
   dplyr::mutate(prop = n / sum(n)) |>
   ggplot2::ggplot() +
   ggplot2::aes(x = prop, y = natureza, label = pct(prop)) +
-  ggplot2::geom_col(fill = "#eccc40") +
-  ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 2) +
-  ggplot2::facet_wrap( ~ resultado_da_constatacao) +
-  ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
+  ggplot2::geom_col(fill = "#eccc40", width= 0.8) +
+  ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 3) +
+  ggplot2::facet_wrap( ~ resultado_da_constatacao, scales = "free_x") +
+  ggplot2::scale_x_continuous(labels = scales::percent) +
   ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
-  ggplot2::theme_minimal(10)
+    ggplot2::theme_minimal(10)
 ```
 
+#### Proporção de casos que tiveram pedido para complementação de documento
 
+```{r quantidade-complementacao}
+cnae_base |>
+  dplyr::filter(!is.na(complementacao_docs)) |> 
+  dplyr::group_by(resultado_da_constatacao) |>
+  dplyr::count(complementacao_docs) |>
+  janitor::adorn_totals() |>
+  dplyr::mutate(prop = n / sum(n)*2) |>
+  dplyr::mutate(prop = formattable::percent(prop)) |>
+  purrr::set_names("Desfecho", "Complementação de Documento", "Quantidade", "%") |>
+  knitr::kable(caption = "Complementação de documento")
+```
 
 #### Desfechos dos processos com perícia prévia 
 
-```{r}
+```{r quantidade-desfechos}
+
 perito_base |> 
 dplyr::filter(tem_pericia == "sim") |> 
 dplyr::filter(!is.na(resultado_final)) |> 
@@ -124,6 +137,7 @@ ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 2) +
 ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1))+
 ggplot2::labs(x = "Proporção", y = "Resultado Final") +
 ggplot2::theme_minimal(10)
+
 ```
 
 

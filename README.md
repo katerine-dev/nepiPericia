@@ -23,9 +23,9 @@ da Receita Federal do Brasil (RFB).
 
 | Deferido | Quantidade |      % |
 |:---------|-----------:|-------:|
-| Não      |         20 |  19.2% |
-| Sim      |         84 |  80.8% |
-| Total    |        104 | 100.0% |
+| Não      |         20 |  19.0% |
+| Sim      |         85 |  81.0% |
+| Total    |        105 | 100.0% |
 
 Quantidade de processos deferidos com perícia prévia
 
@@ -33,9 +33,9 @@ Quantidade de processos deferidos com perícia prévia
 
 | Cnae          | Quantidade |       % |
 |:--------------|-----------:|--------:|
-| Não informada |         31 |  17.22% |
-| Outros        |        149 |  82.78% |
-| Total         |        180 | 100.00% |
+| Não informada |         31 |  16.94% |
+| Outros        |        152 |  83.06% |
+| Total         |        183 | 100.00% |
 
 Atividades econômicas
 
@@ -50,9 +50,19 @@ receita federal.
 
 <img src="README_files/figure-gfm/quantidade-resultados-1.png" style="display: block; margin: auto;" />
 
+#### Proporção de casos que tiveram pedido para complementação de documento
+
+| Desfecho      | Complementação de Documento | Quantidade |       % |
+|:--------------|:----------------------------|-----------:|--------:|
+| Deferimento   | sim                         |         23 |  88.46% |
+| Indeferimento | sim                         |          3 |  11.54% |
+| Total         | \-                          |         26 | 100.00% |
+
+Complementação de documento
+
 #### Desfechos dos processos com perícia prévia
 
-<img src="README_files/figure-gfm/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+<img src="README_files/figure-gfm/quantidade-desfechos-1.png" style="display: block; margin: auto;" />
 
 **Obs:** O processo com o nº processo de **10164223420178260100** foi
 retidado na análise das atividades e naturezas jurídicas, afim de evitar

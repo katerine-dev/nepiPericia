@@ -14,21 +14,21 @@ base_perito <-
 
 # função que limpa nome
 limpa_nomes <- function(str) {
-  str %>%
-    abjutils::rm_accent() %>%
-    stringr::str_to_lower() %>%
+  str |>
+    abjutils::rm_accent() |>
+    stringr::str_to_lower() |>
     stringr::str_squish()
 }
 
 # tidy --------------------------------------------------------------------
-base_cnae_tidy <- base_cnae %>%
-  dplyr::mutate(razao_social = stringr::str_to_lower(razao_social))
+base_cnae_tidy <- base_cnae |>
+  dplyr::mutate(razao_social = stringr::str_to_lower(razao_social)) #tem probleminhas no cnpj de um processo arrumar
 
 
-base_perito_tidy <- base_perito %>%
-  janitor::clean_names() %>%
+base_perito_tidy <- base_perito |>
+  janitor::clean_names() |>
   dplyr::rename(resultado_constatacao = resultado_da_constatacao_deferimento_indeferimento,
-                responsavel_constatacao = resposavel_constatacao) %>%
+                responsavel_constatacao = resposavel_constatacao) |>
   dplyr::select(
     n_processo,
     # colunas base para o join (precisa decidir se relmente faz sentido dar join)
@@ -39,8 +39,9 @@ base_perito_tidy <- base_perito %>%
     recuperanda,
     cnpj,
     responsavel_constatacao,
-    resultado_final,
-  )  %>%
+    complementacao_doc,
+    resultado_final
+  ) |>
   dplyr::mutate(
     deferido = limpa_nomes(deferido),
     tem_pericia = limpa_nomes(tem_pericia),
@@ -53,5 +54,5 @@ base_perito_tidy <- base_perito %>%
 
 # Exportando para estudo --------------------------------------------------
 
-writexl::write_xlsx(base_perito_tidy, "~/Documents/nepiPericia/base_perito.xlsx")
-writexl::write_xlsx(base_cnae_tidy, "~/Documents/nepiPericia/base_cnae.xlsx")
+writexl::write_xlsx(base_perito_tidy, "~/Documents/nepiPericia/data/base_perito.xlsx")
+writexl::write_xlsx(base_cnae_tidy, "~/Documents/nepiPericia/data/base_cnae.xlsx")
