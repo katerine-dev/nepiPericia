@@ -56,7 +56,7 @@ cnae_base |>
   dplyr::filter(n_processo != "10164223420178260100") |>
   dplyr::mutate(cnae_fiscal = forcats::fct_lump_n(
     cnae_fiscal, 1, other_level = "Outros"
-  )) |>  
+ )) |>  
   dplyr::count(cnae_fiscal) |>
   dplyr::arrange(cnae_fiscal) |>
   janitor::adorn_totals() |>
@@ -103,8 +103,25 @@ cnae_base |>
   ggplot2::facet_wrap( ~ resultado_da_constatacao, scales = "free_x") +
   ggplot2::scale_x_continuous(labels = scales::percent) +
   ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
-    ggplot2::theme_minimal(10)
+      ggplot2::theme_minimal(15)
 ```
+
+
+
+
+#### Proporção dos casos identificados como processos físico
+
+```{r quantidade-fisic}
+cnae_base |>
+  dplyr::count(resultado_da_constatacao) |>
+  janitor::adorn_totals() |>
+  dplyr::mutate(prop = n / sum(n)*2) |>
+  dplyr::mutate(prop = formattable::percent(prop)) |>
+  purrr::set_names("Resultado da constatação", "Quantidade", "%") |>
+  knitr::kable(caption = "Quantidade de processos físicos")
+```
+
+
 
 #### Proporção de casos que tiveram pedido para complementação de documento
 
@@ -116,7 +133,7 @@ cnae_base |>
   janitor::adorn_totals() |>
   dplyr::mutate(prop = n / sum(n)*2) |>
   dplyr::mutate(prop = formattable::percent(prop)) |>
-  purrr::set_names("Desfecho", "Complementação de Documento", "Quantidade", "%") |>
+  purrr::set_names("Desfecho", "Complementação de docs", "Quantidade", "%") |>
   knitr::kable(caption = "Complementação de documento")
 ```
 

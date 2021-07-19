@@ -50,13 +50,24 @@ receita federal.
 
 <img src="README_files/figure-gfm/quantidade-resultados-1.png" style="display: block; margin: auto;" />
 
+#### Proporção dos casos identificados como processos físico
+
+| Resultado da constatação | Quantidade |       % |
+|:-------------------------|-----------:|--------:|
+| Deferimento              |        186 |  87.32% |
+| Indeferimento            |         17 |   7.98% |
+| Processo físico          |         10 |   4.69% |
+| Total                    |        213 | 100.00% |
+
+Quantidade de processos físicos
+
 #### Proporção de casos que tiveram pedido para complementação de documento
 
-| Desfecho      | Complementação de Documento | Quantidade |       % |
-|:--------------|:----------------------------|-----------:|--------:|
-| Deferimento   | sim                         |         23 |  88.46% |
-| Indeferimento | sim                         |          3 |  11.54% |
-| Total         | \-                          |         26 | 100.00% |
+| Desfecho      | Complementação de docs | Quantidade |       % |
+|:--------------|:-----------------------|-----------:|--------:|
+| Deferimento   | sim                    |         23 |  88.46% |
+| Indeferimento | sim                    |          3 |  11.54% |
+| Total         | \-                     |         26 | 100.00% |
 
 Complementação de documento
 
