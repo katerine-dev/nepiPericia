@@ -13,35 +13,61 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+# Importação das bases tidys para análise 
+observatorio_pronta_cnae <- readRDS("~/Documents/nepiPericia/data/observatorio_pronta_cnae.rds")
+base_perito <- readRDS("~/Documents/nepiPericia/data/base_perito.rds")
+observatorio_corrigida <- readRDS("~/Documents/nepiPericia/data/observatorio_corrigida.rds")
+
+```
+
+
 # Análise de Constatação Prévia 
 
 Visualizações produzidas para apresentação de projeto no NEPI - Núcleo de Estudos e Pesquisa em Insolvência (PUC-SP). 
 
 A base original foi adquirida pelo estudo do Observatório da Insolvência: Segunda fase da Associação Brasileira de Jurimetria. A partir dela foram realizados análises relacionados aos tipos de empresa e atividade econômicas das partes.
-Resultando em novas duas bases:
-A Base original constavam 122 casos que apresentavam perícia prévia, mas realizando a classificação manual para a base da análise de perito foram identificados 18 casos fora do escop (*Esse resultado será considerado na atualização da base originária*), restando portando 104 processos com perícia prévia. 
+
+A Base original constavam 122 casos que apresentavam perícia prévia, mas realizando a classificação manual para a base da análise de perito foram identificados 18 casos fora do escopo (*Esse resultado será considerado na atualização da base originária*), restando portando 105 processos com perícia prévia. 
+
+No total de casos coletados pelo Observatório da Fase 2 - Atualização foram identificados uma porcentagem de 8.79% de casos que tiveram a constatação
+prévia:
+
+
+```{r quantidade-pericia}
+observatorio_corrigida |>
+  dplyr::select(pericia) |>
+  dplyr::count(pericia) |>
+  janitor::adorn_totals() |>
+  dplyr::mutate(prop = n / sum(n) * 2) |>
+  dplyr::mutate(prop = formattable::percent(prop)) |>
+  purrr::set_names("Pericia", "Quantidade", "%") |>
+  knitr::kable(caption = "Pericia prévia quantidade")
+```
 
 Para a análise relacionado às empresas foi considerado a base de dados da Receita Federal do Brasil (RFB). 
 
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE}
-#Importação das bases tidys para análise 
-path_bases <-  "~/Documents/nepiPericia/data/"
-importar_bases <- fs::dir_ls(path = path_bases, pattern = ".xls")
-
-cnae_base <-
-  readxl::read_excel(paste0(path = path_bases, "base_cnae.xlsx"))
-perito_base <-
-  readxl::read_excel(paste0(path = path_bases, "base_perito.xlsx"))
-
-```
 #### Casos deferidos e indeferidos porcentagem 
-```{r quantidade-deferido}
-perito_base |>
-  dplyr::filter(tem_pericia == "sim") |>
+
+```{r quantidade-pericia-deferido}
+observatorio_corrigida |>
+  dplyr::filter(pericia == "Sim") |>
   dplyr::count(deferido) |>
-  dplyr::mutate(deferido = stringr::str_replace(deferido, "nao", "Não")) |>
-  dplyr::mutate(deferido = stringr::str_replace(deferido, "sim", "Sim")) |>
+  dplyr::mutate(prop = n / sum(n)) |>
+  janitor::adorn_totals() |>
+  dplyr::mutate(prop = formattable::percent(prop, 1)) |>
+  purrr::set_names("Deferido", "Quantidade", "%") |>
+  knitr::kable(caption = "Quantidade de processos deferidos com perícia prévia")
+```
+Desses não deferidos: 
+
+```{r quantidade-deferido}
+base_perito |>
+  dplyr::filter(pericia == "sim") |>
+  dplyr::filter(deferido == "nao") |>
+  #dplyr::select(resultado_constatacao, n_processo) |>
+  dplyr::count(resultado_constatacao) |>
   dplyr::mutate(prop = n / sum(n)) |>
   janitor::adorn_totals() |>
   dplyr::mutate(prop = formattable::percent(prop, 1)) |>
@@ -49,73 +75,45 @@ perito_base |>
   knitr::kable(caption = "Quantidade de processos deferidos com perícia prévia")
 ```
 
+#### Distribuição dos casos: 
+
+```{r distribuica-casos}
+observatorio_corrigida |>
+  dplyr::group_by(pericia) |>
+  dplyr::count(capital) |>
+  dplyr::mutate(prop = n / sum(n)) |>
+  janitor::adorn_totals() |>
+  dplyr::mutate(prop = formattable::percent(prop) / 2) |>
+  purrr::set_names("Pericia", "Capital", "Quantidade", "%") |>
+  knitr::kable(caption = "Quantos distribuidos na capital")
+```
+
+
 #### Atividades econômicas 
 
 ```{r quantidade-atividades}
-cnae_base |>
-  dplyr::filter(n_processo != "10164223420178260100") |>
-  dplyr::mutate(cnae_fiscal = forcats::fct_lump_n(
-    cnae_fiscal, 1, other_level = "Outros"
- )) |>  
-  dplyr::count(cnae_fiscal) |>
-  dplyr::arrange(cnae_fiscal) |>
+observatorio_pronta_cnae |>
+  dplyr::filter(!is.na(nm_cnae)) |>
+  dplyr::mutate(nm_cnae = forcats::fct_lump_n(nm_cnae, 5, other_level = "Outros")) |>
+  dplyr::group_by(pericia) |>
+  dplyr::count(nm_cnae) |>
+  dplyr::arrange(nm_cnae) |>
   janitor::adorn_totals() |>
-  dplyr::mutate(prop = n / sum(n)*2) |>
+  dplyr::mutate(prop = n / sum(n) * 2) |>
   dplyr::mutate(prop = formattable::percent(prop)) |>
-  purrr::set_names("Cnae", "Quantidade", "%") |>
+  purrr::set_names("Pericia", "Cnae", "Quantidade", "%") |>
   knitr::kable(caption = "Atividades econômicas")
 ```
-*Não informadas* no Comprovante de Inscrição e de Situação Cadastral da receita federal. 
-
-#### Gráfico de barras da porcentagem das naturezas jurídicas 
-
-```{r quantidade-natureza}
-# para considerar apenas uma casa depois da virgula na label
-pct <- \(x) scales::percent(x, accuracy = .1)
-cnae_base |>
-  dplyr::filter(n_processo != "10164223420178260100") |>
-  dplyr::count(natureza, sort = TRUE) |> 
-  dplyr::mutate(natureza = forcats::fct_reorder(natureza, n)) |> 
-  dplyr::mutate(prop = n/sum(n)) |> 
-  ggplot2::ggplot() +
-  ggplot2::aes(x = prop, y = natureza, label = pct(prop)) +
-  ggplot2::geom_col(fill = "#eccc40", width = .8)+
-  ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 3) +
-  ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
-  ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
-  ggplot2::theme_minimal(10)
-```
-
-
-#### Resultado da constatação prévia por natureza jurídica
-
-```{r quantidade-resultados}
-cnae_base |>
-  dplyr::filter(n_processo != "10164223420178260100") |>
-  dplyr::group_by(resultado_da_constatacao) |>
-  dplyr::count(natureza) |>
-  dplyr::mutate(natureza = forcats::fct_reorder(natureza, n, sum)) |> 
-  dplyr::mutate(prop = n / sum(n)) |>
-  ggplot2::ggplot() +
-  ggplot2::aes(x = prop, y = natureza, label = pct(prop)) +
-  ggplot2::geom_col(fill = "#eccc40", width= 0.8) +
-  ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 3) +
-  ggplot2::facet_wrap( ~ resultado_da_constatacao, scales = "free_x") +
-  ggplot2::scale_x_continuous(labels = scales::percent) +
-  ggplot2::labs(x = "Proporção", y = "Natureza Jurídica") +
-      ggplot2::theme_minimal(15)
-```
-
-
 
 
 #### Proporção dos casos identificados como processos físico
 
-```{r quantidade-fisic}
-cnae_base |>
-  dplyr::count(resultado_da_constatacao) |>
+```{r quantidade-resultado}
+base_perito |>
+  dplyr::filter(pericia == "sim") |>
+  dplyr::count(resultado_constatacao) |>
   janitor::adorn_totals() |>
-  dplyr::mutate(prop = n / sum(n)*2) |>
+  dplyr::mutate(prop = n / sum(n) * 2) |>
   dplyr::mutate(prop = formattable::percent(prop)) |>
   purrr::set_names("Resultado da constatação", "Quantidade", "%") |>
   knitr::kable(caption = "Quantidade de processos físicos")
@@ -126,41 +124,62 @@ cnae_base |>
 #### Proporção de casos que tiveram pedido para complementação de documento
 
 ```{r quantidade-complementacao}
-cnae_base |>
-  dplyr::filter(!is.na(complementacao_docs)) |> 
-  dplyr::group_by(resultado_da_constatacao) |>
-  dplyr::count(complementacao_docs) |>
+base_perito |>
+  dplyr::filter(!is.na(complementacao_doc)) |>
+  dplyr::group_by(resultado_constatacao) |>
+  dplyr::count(complementacao_doc) |>
   janitor::adorn_totals() |>
-  dplyr::mutate(prop = n / sum(n)*2) |>
+  dplyr::mutate(prop = n / sum(n) * 2) |>
   dplyr::mutate(prop = formattable::percent(prop)) |>
   purrr::set_names("Desfecho", "Complementação de docs", "Quantidade", "%") |>
   knitr::kable(caption = "Complementação de documento")
 ```
 
-#### Desfechos dos processos com perícia prévia 
+#### Desfechos dos processos
 
 ```{r quantidade-desfechos}
-
-perito_base |> 
-dplyr::filter(tem_pericia == "sim") |> 
-dplyr::filter(!is.na(resultado_final)) |> 
-dplyr::mutate(resultado_final = stringr::str_to_sentence(resultado_final)) |> 
-dplyr::count(resultado_final) |> 
-dplyr::mutate(prop = n/sum(n)) |>
-ggplot2::ggplot()+
-ggplot2::aes(x = prop , y = forcats::fct_reorder(resultado_final, prop),  label = pct(prop)) +
-ggplot2::geom_col(fill = "#eccc40", width = .8)+
-ggplot2::geom_label(ggplot2::aes(x = prop/2), size = 2) +
-ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1))+
-ggplot2::labs(x = "Proporção", y = "Resultado Final") +
-ggplot2::theme_minimal(10)
+pct <- \(x) scales::percent(x, accuracy = .1)
+observatorio_corrigida |>
+  dplyr::filter(!is.na(desfecho_final)) |>
+  dplyr::mutate(desfecho_final = stringr::str_to_sentence(desfecho_final)) |>
+  dplyr::group_by(pericia) |>
+  dplyr::count(desfecho_final) |>
+  dplyr::mutate(prop = n / sum(n)) |>
+  ggplot2::ggplot() +
+  ggplot2::aes(
+    x = prop ,
+    y = forcats::fct_reorder(desfecho_final, prop),
+    label = pct(prop)
+  ) +
+  ggplot2::geom_col(fill = "#eccc40", width = .8) +
+  ggplot2::geom_label(ggplot2::aes(x = prop / 2), size = 2) +
+  ggplot2::scale_x_continuous(labels = scales::percent, limits = c (0, 1)) +
+  ggplot2::facet_wrap(~ pericia) +
+  ggplot2::labs(x = "Proporção", y = "Resultado Final") +
+  ggplot2::theme_minimal(10)
 
 ```
 
 
+#### Tempos 
 
-
-
-__Obs:__ O processo com o nº processo de __10164223420178260100__ foi retidado na análise das atividades e naturezas jurídicas, afim de evitar dados que poderiam influenciar os resultados (*Processo consiste em um litisconsórcio de 30 empresas do meus grupo econômico*).
-
+```{r tempos}
+observatorio_corrigida |>
+  dplyr::filter(pericia == "Sim" & deferido == "Sim") |>
+  dplyr::transmute("Tempo deferimento" = data_deferimento - data_dist,
+                   "Tempo pericia" =  data_pericia - data_dist) |>
+  tidyr::pivot_longer(c("Tempo deferimento", "Tempo pericia")) |>
+  dplyr::group_by(name) |>
+  ggplot2::ggplot() +
+  ggplot2::aes(x = value, y = name) +
+  ggridges::geom_density_ridges(
+    fill = "white",
+    color = 4,
+    ,
+    jittered_points = TRUE,
+    alpha = 0.7
+  ) +
+  ggplot2::labs(x = "Dias", y = "Tempos") +
+  ggplot2::theme_minimal(10)
+```
 
